@@ -6,9 +6,11 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -40,24 +42,18 @@ public class Ordenador extends JFrame implements Runnable {
 	private CasoOrdenamiento casoOrdenamiento;
 
 	private EstrategiaOrdenamiento estrategiaOrdenamiento;
+	
+	private int cantidadElementos;
 
 	public Ordenador(int cantidadElementos, int tiempoDemoraEntreOperacion, CasoOrdenamiento casoOrdenamiento,
 			MetodoOrdenamiento metodoOrdenamiento) {
 
-		this.elementosAOrdenar = new LinkedList<>();
-		this.elementosAOrdenar.add(new Elemento(4));
-		this.elementosAOrdenar.add(new Elemento(10));
-		this.elementosAOrdenar.add(new Elemento(15));
-		this.elementosAOrdenar.add(new Elemento(1));
-		this.elementosAOrdenar.add(new Elemento(100));
-		this.elementosAOrdenar.add(new Elemento(50));
-		this.elementosAOrdenar.add(new Elemento(33));
-		this.elementosAOrdenar.add(new Elemento(9));
-		this.elementosAOrdenar.add(new Elemento(5));
-		this.elementosAOrdenar.add(new Elemento(300));
+		this.cantidadElementos = cantidadElementos;
 
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
 		this.casoOrdenamiento = casoOrdenamiento;
+		
+		generarDatosAOrdernar();
 
 		if (metodoOrdenamiento.equals(MetodoOrdenamiento.BURBUJEO))
 			this.estrategiaOrdenamiento = new Burbujeo(this);
@@ -99,6 +95,65 @@ public class Ordenador extends JFrame implements Runnable {
 	public void display(){
 		elementosAOrdenar.forEach(elemento -> elemento.setState(ElementState.ORDENADO));
 		panelOrdenador.repaint();
+	}
+	
+	private void generarDatosAOrdernar() {
+		elementosAOrdenar = new LinkedList<>();
+		
+		switch (casoOrdenamiento) {
+			
+			case ALEATORIO:
+			default:
+				//En vez de generarlo con un random, meto los elementos en la lista y hago un shuffle. Es una forma facil de hacer que no tengamos repetidos
+				for (int i = 1; i < cantidadElementos + 1; ++i) {
+					elementosAOrdenar.add(new Elemento(i));
+				}
+				
+				Collections.shuffle(elementosAOrdenar);
+				break;
+			case CASI_INVERTIDO:
+				
+				for (int i = cantidadElementos + 1; i > 0; --i) {
+					
+					//Con estos nos aseguramos que est� un poco desordenado. Se supone que va a estar 33% deordenado
+					if (ThreadLocalRandom.current().nextInt(0, 3) == 1) {
+						elementosAOrdenar.add(new Elemento((i-1)));
+						elementosAOrdenar.add(new Elemento(i));
+						i--;
+					}
+					else {
+						elementosAOrdenar.add(new Elemento(i));	
+					}
+				}
+	
+				break;
+			case CASI_ORDENADO:
+				for (int i = 1; i < cantidadElementos + 1 ; ++i) {
+					
+					//Con estos nos aseguramos que est� un poco desordenado. Se supone que va a estar 33% deordenado
+					if (ThreadLocalRandom.current().nextInt(0, 3) == 1) {
+						elementosAOrdenar.add(new Elemento((i+1)));
+						elementosAOrdenar.add(new Elemento(i));
+						i++;
+					}
+					else {
+						elementosAOrdenar.add(new Elemento(i));	
+					}
+				}
+				
+				break;
+			case INVERTIDO:
+				for (int i = cantidadElementos + 1; i > 0; --i) {
+					elementosAOrdenar.add(new Elemento(i));
+				}
+				break;
+			case ORDENADO:
+				for (int i = 1; i < cantidadElementos + 1; ++i) {
+					elementosAOrdenar.add(new Elemento(i));
+				}	
+				break;			
+		
+		}
 	}
 
 	public void display(int actual, int comparado) {
@@ -178,7 +233,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(10, 1000, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.BURBUJEO);
+		Ordenador ordenador = new Ordenador(100, 10, CasoOrdenamiento.INVERTIDO, MetodoOrdenamiento.BURBUJEO);
 		ordenador.init();
 		ordenador.run();
 	}
