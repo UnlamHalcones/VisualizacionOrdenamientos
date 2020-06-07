@@ -31,3 +31,11 @@ burbujeo,casi ordenado,1000,10.3
 **Nota:** Si es entregado de forma correcta antes del sábado 06/06/2020 a las 10am, la entrega sumara puntos extras.
 
 **Nota 2:** Los mejores proyectos se integrarán al repositorio permanente de la materia. Puede optarse por ingresarlo en forma anónima, o con autoría.
+
+
+Pendientes:
+
+ - [ ] Hacer que se guarden los csv
+ - [ ] Colores en QuickSort
+ - [ ] Colores en Inserción
+ - [ ] Actualizar este Readme con instrucciones de uso
