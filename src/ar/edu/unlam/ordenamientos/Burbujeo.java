@@ -2,35 +2,30 @@ package ar.edu.unlam.ordenamientos;
 
 import java.util.List;
 
-import ar.edu.unlam.entidades.Elemento;
 import ar.edu.unlam.graphics.Ordenador;
 
-public class Burbujeo<T extends Comparable<T>> extends EstrategiaOrdenamiento<Elemento> {
+public class Burbujeo<T extends Comparable<T>> extends EstrategiaOrdenamiento<T> {
 
-	public Burbujeo(List<Elemento> elementosAOrdenar, Ordenador jFrameReference) {
-		super(elementosAOrdenar, jFrameReference);
+	public Burbujeo(Ordenador jFrameOrdenamiento) {
+		super(jFrameOrdenamiento);
 	}
 
-	void ordenar(List<Elemento> arreglo, Ordenador jFrameReference) {
-		boolean huboCambio = false;
+	public void ordenar(List<T> arreglo) {
+		boolean huboCambio;
 		do {
 			huboCambio = false;
 			for (int i = 0; i < arreglo.size() - 1; i++) {
-				Elemento actual = arreglo.get(i);
-				Elemento comparador = arreglo.get(i+1);
+				T actual = arreglo.get(i);
+				T comparador = arreglo.get(i+1);
+				cantComparaciones++;
 				if (actual.compareTo(comparador) > 0) {
 					intercambiar(arreglo, i, i + 1);
 					huboCambio = true;
+					cantOperaciones++;
 				}
-				jFrameReference.display();
+				jFrameOrdenador.display(i, i + 1);
+				jFrameOrdenador.sleep();
 			}
-			try {
-				Thread.sleep(jFrameReference.getTiempoDemoraEntreOperacion());
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
 		} while (huboCambio);
 	}
 

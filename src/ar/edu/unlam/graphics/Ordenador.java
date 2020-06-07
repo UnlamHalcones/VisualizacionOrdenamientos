@@ -45,9 +45,6 @@ public class Ordenador extends JFrame implements Runnable {
 			MetodoOrdenamiento metodoOrdenamiento) {
 
 		this.elementosAOrdenar = new LinkedList<>();
-//		for (int i = 0; i < cantidadElementos; ++i) {
-//			this.elementosAOrdenar.add(new Elemento(ThreadLocalRandom.current().nextInt(0, 401)));
-//		}
 		this.elementosAOrdenar.add(new Elemento(4));
 		this.elementosAOrdenar.add(new Elemento(10));
 		this.elementosAOrdenar.add(new Elemento(15));
@@ -63,7 +60,7 @@ public class Ordenador extends JFrame implements Runnable {
 		this.casoOrdenamiento = casoOrdenamiento;
 
 		if (metodoOrdenamiento.equals(MetodoOrdenamiento.BURBUJEO))
-			this.estrategiaOrdenamiento = new Burbujeo(this.elementosAOrdenar, this);
+			this.estrategiaOrdenamiento = new Burbujeo(this);
 
 		setSize(1200, 450);
 		setLocationRelativeTo(null);
@@ -86,24 +83,47 @@ public class Ordenador extends JFrame implements Runnable {
 
 		long next_game_tick = System.currentTimeMillis();
 
-		CompletableFuture.runAsync(this.estrategiaOrdenamiento);
+		Thread hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
+		// Corro el hilo de ordenamiento de manera asincrónica
+		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
 
 		do {
 			if (System.currentTimeMillis() > next_game_tick) {
 				loops++;
 				next_game_tick += SKIP_TICKS;
 			}
-		} while (this.estrategiaOrdenamiento.isRunning());
+		} while (!futureOrdenamiento.isDone());
+		display();
 	}
 
-	public void update() {
-
-	}
-
-	public void display() {
+	public void display(){
+		elementosAOrdenar.forEach(elemento -> elemento.setState(ElementState.ORDENADO));
 		panelOrdenador.repaint();
 	}
 
+	public void display(int actual, int comparado) {
+		resetElementsColor();
+		elementosAOrdenar.get(actual).setState(ElementState.ACTUAL);
+		elementosAOrdenar.get(comparado).setState(ElementState.COMPARADOR);
+		panelOrdenador.repaint();
+	}
+
+	private void resetElementsColor() {
+		elementosAOrdenar.forEach(element -> element.setState(ElementState.INICIAL));
+	}
+
+	public void sleep() {
+		try {
+			Thread.sleep(this.getTiempoDemoraEntreOperacion());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Clase usada para dibujar las barras de ordenamiento
+	 */
 	private class PanelOrdenador extends JPanel {
 
 		public PanelOrdenador() {
@@ -120,6 +140,12 @@ public class Ordenador extends JFrame implements Runnable {
 
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
 			g2.drawString("Time: " + String.format("%6s", loops * SKIP_TICKS) + "ms", 20, 25);
+
+			g2.setFont(new Font("Dialog", Font.BOLD, 24));
+			g2.drawString("Comparaciones: " + String.format("%6s", estrategiaOrdenamiento.getCantComparaciones()), 420, 25);
+
+			g2.setFont(new Font("Dialog", Font.BOLD, 24));
+			g2.drawString("Intercambios: " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
 
 			int i = 0;
 
