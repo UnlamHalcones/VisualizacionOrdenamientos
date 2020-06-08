@@ -21,6 +21,7 @@ import ar.edu.unlam.entidades.Elemento;
 import ar.edu.unlam.entidades.MetodoOrdenamiento;
 import ar.edu.unlam.ordenamientos.Burbujeo;
 import ar.edu.unlam.ordenamientos.EstrategiaOrdenamiento;
+import ar.edu.unlam.ordenamientos.QuickSort;
 
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
@@ -57,6 +58,8 @@ public class Ordenador extends JFrame implements Runnable {
 
 		if (metodoOrdenamiento.equals(MetodoOrdenamiento.BURBUJEO))
 			this.estrategiaOrdenamiento = new Burbujeo(this);
+		else if(metodoOrdenamiento.equals(MetodoOrdenamiento.QUICKSORT))
+			this.estrategiaOrdenamiento = new QuickSort(this);
 
 		setSize(1200, 450);
 		setLocationRelativeTo(null);
@@ -233,7 +236,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(100, 10, CasoOrdenamiento.INVERTIDO, MetodoOrdenamiento.BURBUJEO);
+		Ordenador ordenador = new Ordenador(100, 10, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
 		ordenador.init();
 		ordenador.run();
 	}
