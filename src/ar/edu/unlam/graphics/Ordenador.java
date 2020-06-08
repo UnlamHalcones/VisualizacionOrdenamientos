@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -140,17 +141,18 @@ public class Ordenador extends JFrame implements Runnable {
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
 			g2.drawString("Intercambios: " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
 
-			int i = 0;
+			double i = 0;
 
-			int anchoBarra = (int) currentDimension.getWidth() / elementosAOrdenar.size();
+			double anchoBarra = currentDimension.getWidth() / elementosAOrdenar.size();
 			for (Elemento elemento : elementosAOrdenar) {
-				g2.setColor(ElementState.getColorByState(elemento.getState()));
 				AffineTransform old = g2.getTransform();
 
 				g2.translate(0, getHeight() - 1);
 				g2.scale(1, -1);
 
-				g2.fillRect(i, 0, anchoBarra, elemento.getValor());
+				g2.setColor(ElementState.getColorByState(elemento.getState()));
+				Rectangle2D.Double rect = new Rectangle2D.Double(i, 0, anchoBarra, elemento.getValor());
+				g2.fill(rect);
 
 				g2.setTransform(old);
 
