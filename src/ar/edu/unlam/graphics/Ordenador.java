@@ -20,6 +20,7 @@ import ar.edu.unlam.entidades.Elemento;
 import ar.edu.unlam.entidades.MetodoOrdenamiento;
 import ar.edu.unlam.generador.datos.GeneradorDeDatos;
 import ar.edu.unlam.ordenamientos.*;
+import ar.edu.unlam.generador.datos.ManejadorArchivos;
 
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
@@ -31,7 +32,9 @@ public class Ordenador extends JFrame implements Runnable {
 	private final int HEIGHT = 450;
 
 	private int loops = 0;
-
+	
+	private CasoOrdenamiento casoOrdenamiento;
+	
 	private List<Elemento> elementosAOrdenar;
 	private PanelOrdenador panelOrdenador;
 
@@ -55,7 +58,9 @@ public class Ordenador extends JFrame implements Runnable {
 		this.estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(metodoOrdenamiento);
 
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
-
+		
+		this.casoOrdenamiento=casoOrdenamiento;
+		
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
 	}
@@ -88,6 +93,7 @@ public class Ordenador extends JFrame implements Runnable {
 			}
 		} while (!futureOrdenamiento.isDone());
 		display();
+		guardarRegistro();
 	}
 
 	public void display(){
@@ -113,6 +119,12 @@ public class Ordenador extends JFrame implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void guardarRegistro () {
+		
+		String linea = this.estrategiaOrdenamiento.getClass().toString().substring(33).toLowerCase()+";"+this.casoOrdenamiento.toString().toLowerCase()+";"+this.elementosAOrdenar.size()+";"+loops * SKIP_TICKS*0.001+" seg";
+		ManejadorArchivos.agregarRegistro(linea);
 	}
 
 	/**
@@ -173,7 +185,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		Ordenador ordenador = new Ordenador(45, 10, CasoOrdenamiento.CASI_INVERTIDO, MetodoOrdenamiento.QUICKSORT);
 		ordenador.init();
 		ordenador.run();
 	}
