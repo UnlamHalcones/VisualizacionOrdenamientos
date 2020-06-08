@@ -37,7 +37,6 @@ public class Ordenador extends JFrame implements Runnable {
 	private int tiempoDemoraEntreOperacion;
 
 	private EstrategiaOrdenamiento estrategiaOrdenamiento;
-	private int cantidadElementos;
 
 	private Map<MetodoOrdenamiento, EstrategiaOrdenamiento> mapaEstrategiaOrdenamiento;
 
@@ -50,8 +49,8 @@ public class Ordenador extends JFrame implements Runnable {
 		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.INSERCION, new Insercion(this));
 		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.SELECCION, new Seleccion(this));
 
-		this.cantidadElementos = cantidadElementos;
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
+
 		this.estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(metodoOrdenamiento);
 
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
