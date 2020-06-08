@@ -6,9 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,17 +17,17 @@ import ar.edu.unlam.entidades.CasoOrdenamiento;
 import ar.edu.unlam.entidades.ElementState;
 import ar.edu.unlam.entidades.Elemento;
 import ar.edu.unlam.entidades.MetodoOrdenamiento;
-import ar.edu.unlam.ordenamientos.Burbujeo;
-import ar.edu.unlam.ordenamientos.EstrategiaOrdenamiento;
-import ar.edu.unlam.ordenamientos.QuickSort;
+import ar.edu.unlam.generador.datos.GeneradorDeDatos;
+import ar.edu.unlam.ordenamientos.*;
 
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
 
-	// OJO: Los valores de SKIP son un resultado de una división entera!
 	private final int SECOND = 1000;
 	private final int TICKS_PER_SECOND = 1000;
 	private final int SKIP_TICKS = SECOND / TICKS_PER_SECOND;
+	private final int WIDTH = 1200;
+	private final int HEIGHT = 450;
 
 	private int loops = 0;
 
@@ -37,27 +35,28 @@ public class Ordenador extends JFrame implements Runnable {
 	private PanelOrdenador panelOrdenador;
 
 	private int tiempoDemoraEntreOperacion;
-	private CasoOrdenamiento casoOrdenamiento;
 
 	private EstrategiaOrdenamiento estrategiaOrdenamiento;
-	
 	private int cantidadElementos;
+
+	private Map<MetodoOrdenamiento, EstrategiaOrdenamiento> mapaEstrategiaOrdenamiento;
 
 	public Ordenador(int cantidadElementos, int tiempoDemoraEntreOperacion, CasoOrdenamiento casoOrdenamiento,
 			MetodoOrdenamiento metodoOrdenamiento) {
 
+		mapaEstrategiaOrdenamiento = new HashMap<>();
+		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.QUICKSORT, new QuickSort(this));
+		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.BURBUJEO, new Burbujeo(this));
+		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.INSERCION, new Insercion(this));
+		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.SELECCION, new Seleccion(this));
+
 		this.cantidadElementos = cantidadElementos;
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
-		this.casoOrdenamiento = casoOrdenamiento;
-		
-		generarDatosAOrdernar();
+		this.estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(metodoOrdenamiento);
 
-		if (metodoOrdenamiento.equals(MetodoOrdenamiento.BURBUJEO))
-			this.estrategiaOrdenamiento = new Burbujeo(this);
-		else if(metodoOrdenamiento.equals(MetodoOrdenamiento.QUICKSORT))
-			this.estrategiaOrdenamiento = new QuickSort(this);
+		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
 
-		setSize(1200, 450);
+		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
 	}
 
@@ -94,65 +93,6 @@ public class Ordenador extends JFrame implements Runnable {
 	public void display(){
 		elementosAOrdenar.forEach(elemento -> elemento.setState(ElementState.ORDENADO));
 		panelOrdenador.repaint();
-	}
-	
-	private void generarDatosAOrdernar() {
-		elementosAOrdenar = new LinkedList<>();
-		
-		switch (casoOrdenamiento) {
-			
-			case ALEATORIO:
-			default:
-				//En vez de generarlo con un random, meto los elementos en la lista y hago un shuffle. Es una forma facil de hacer que no tengamos repetidos
-				for (int i = 1; i < cantidadElementos + 1; ++i) {
-					elementosAOrdenar.add(new Elemento(i));
-				}
-				
-				Collections.shuffle(elementosAOrdenar);
-				break;
-			case CASI_INVERTIDO:
-				
-				for (int i = cantidadElementos + 1; i > 0; --i) {
-					
-					//Con estos nos aseguramos que est� un poco desordenado. Se supone que va a estar 33% deordenado
-					if (ThreadLocalRandom.current().nextInt(0, 3) == 1) {
-						elementosAOrdenar.add(new Elemento((i-1)));
-						elementosAOrdenar.add(new Elemento(i));
-						i--;
-					}
-					else {
-						elementosAOrdenar.add(new Elemento(i));	
-					}
-				}
-	
-				break;
-			case CASI_ORDENADO:
-				for (int i = 1; i < cantidadElementos + 1 ; ++i) {
-					
-					//Con estos nos aseguramos que est� un poco desordenado. Se supone que va a estar 33% deordenado
-					if (ThreadLocalRandom.current().nextInt(0, 3) == 1) {
-						elementosAOrdenar.add(new Elemento((i+1)));
-						elementosAOrdenar.add(new Elemento(i));
-						i++;
-					}
-					else {
-						elementosAOrdenar.add(new Elemento(i));	
-					}
-				}
-				
-				break;
-			case INVERTIDO:
-				for (int i = cantidadElementos + 1; i > 0; --i) {
-					elementosAOrdenar.add(new Elemento(i));
-				}
-				break;
-			case ORDENADO:
-				for (int i = 1; i < cantidadElementos + 1; ++i) {
-					elementosAOrdenar.add(new Elemento(i));
-				}	
-				break;			
-		
-		}
 	}
 
 	public void display(int actual, int comparado) {
@@ -232,7 +172,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(100, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		Ordenador ordenador = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
 		ordenador.init();
 		ordenador.run();
 	}
