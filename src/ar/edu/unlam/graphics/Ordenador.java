@@ -36,9 +36,6 @@ public class Ordenador extends JFrame implements Runnable {
 	private List<Elemento> elementosAOrdenar;
 	private PanelOrdenador panelOrdenador;
 
-	private Integer cantidadComparaciones;
-	private Integer cantidadIntercambios;
-
 	private int tiempoDemoraEntreOperacion;
 	private CasoOrdenamiento casoOrdenamiento;
 
@@ -50,7 +47,6 @@ public class Ordenador extends JFrame implements Runnable {
 			MetodoOrdenamiento metodoOrdenamiento) {
 
 		this.cantidadElementos = cantidadElementos;
-
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
 		this.casoOrdenamiento = casoOrdenamiento;
 		
@@ -81,7 +77,7 @@ public class Ordenador extends JFrame implements Runnable {
 	public void run() {
 
 		long next_game_tick = System.currentTimeMillis();
-
+		
 		Thread hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
 		// Corro el hilo de ordenamiento de manera asincrónica
 		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
@@ -236,7 +232,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(100, 10, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		Ordenador ordenador = new Ordenador(100, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
 		ordenador.init();
 		ordenador.run();
 	}

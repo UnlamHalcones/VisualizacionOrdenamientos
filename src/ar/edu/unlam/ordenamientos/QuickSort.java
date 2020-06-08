@@ -1,6 +1,5 @@
 package ar.edu.unlam.ordenamientos;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import ar.edu.unlam.graphics.Ordenador;
@@ -13,36 +12,35 @@ public class QuickSort<T extends Comparable<T>> extends EstrategiaOrdenamiento<T
 
 	@Override
 	public void ordenar(List<T> arreglo) {
-		quickSort(arreglo, 0, arreglo.size()-1);
+		ordenar(arreglo, 0, arreglo.size() - 1);
 	}
-	
-	
-    private void quickSort(List<T> arreglo, int inicio, int fin){
-        if(inicio < fin){
-            int q = particion(arreglo, inicio, fin);
-            quickSort(arreglo, inicio, q);
-            quickSort(arreglo, q+1, fin);
-        }
-    }
 
-    private int particion(List<T> arreglo, int inicio, int fin){
-        T ultimo = arreglo.get(fin-1);
-        int i = inicio-1;
-        
-		jFrameOrdenador.display(inicio, fin); 
+	private void ordenar(List<T> arreglo, int inferior, int superior) {
+		if (inferior < superior) {
+			int pivot = partition(arreglo, inferior, superior);
+
+			ordenar(arreglo, inferior, pivot - 1);
+			ordenar(arreglo, pivot + 1, superior);
+		}
+	}
+
+	private int partition(List<T> arreglo, int inferior, int superior) {
+		T pivot = arreglo.get(superior);
+		int i = (inferior - 1);
+		
+		jFrameOrdenador.display(inferior, superior); 
 		jFrameOrdenador.sleep();
 		
-        for(int j = inicio; j < fin-1; j++){
-            if(arreglo.get(j).compareTo(ultimo) <= -1 || arreglo.get(j).compareTo(ultimo) == 0){
-                i = i+1;
-                intercambiar(arreglo, j, i);
-            }
-        }
-        intercambiar(arreglo, fin-1, i+1);
-        return i + 1;
-    }
+		for (int j = inferior; j < superior; j++) {
+			cantComparaciones++;
+			if (arreglo.get(j).compareTo(pivot) < 0) {
+				i++;
+				intercambiar(arreglo, i, j);
+				cantOperaciones++;
+			}
+		}
+		intercambiar(arreglo, i + 1, superior);
 
-
-	
-
+		return i + 1;
+	}
 }
