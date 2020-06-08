@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,8 +25,8 @@ public class Ordenador extends JFrame implements Runnable {
 	private final int SECOND = 1000;
 	private final int TICKS_PER_SECOND = 1000;
 	private final int SKIP_TICKS = SECOND / TICKS_PER_SECOND;
-	private final int WIDTH = 1200;
-	private final int HEIGHT = 450;
+	private static final int DEFAULT_WIDTH = 1200;
+	private static final int DEFAULT_HEIGHT = 450;
 
 	private int loops = 0;
 
@@ -55,7 +54,7 @@ public class Ordenador extends JFrame implements Runnable {
 
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
 
-		setSize(WIDTH, HEIGHT);
+		setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		setLocationRelativeTo(null);
 	}
 
@@ -77,15 +76,14 @@ public class Ordenador extends JFrame implements Runnable {
 		long next_game_tick = System.currentTimeMillis();
 		
 		Thread hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
-		// Corro el hilo de ordenamiento de manera asincrónica
-		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
+		hiloOrdenamiento.run();
 
 		do {
 			if (System.currentTimeMillis() > next_game_tick) {
 				loops++;
 				next_game_tick += SKIP_TICKS;
 			}
-		} while (!futureOrdenamiento.isDone());
+		} while (hiloOrdenamiento.isAlive());
 		display();
 	}
 
@@ -161,7 +159,7 @@ public class Ordenador extends JFrame implements Runnable {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(1200, 450);
+			return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		}
 
 	}
