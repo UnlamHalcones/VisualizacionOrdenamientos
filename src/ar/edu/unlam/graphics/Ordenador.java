@@ -41,6 +41,16 @@ public class Ordenador extends JFrame implements Runnable {
 
 	private Map<MetodoOrdenamiento, EstrategiaOrdenamiento> mapaEstrategiaOrdenamiento;
 
+	private static Thread sortingThread;
+
+	public static Visualizador frame;
+	public static Integer[] vecSort;
+	public static boolean blnSort = false;
+	public static int valorSort = 200;
+	public static int sleep = 20;
+	public static int blockWidth;
+	public static boolean stepped = false;
+	
 	public Ordenador(int cantidadElementos, int tiempoDemoraEntreOperacion, CasoOrdenamiento casoOrdenamiento,
 			MetodoOrdenamiento metodoOrdenamiento) {
 
@@ -78,7 +88,7 @@ public class Ordenador extends JFrame implements Runnable {
 		long next_game_tick = System.currentTimeMillis();
 		
 		Thread hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
-		// Corro el hilo de ordenamiento de manera asincrÃ³nica
+		// Corro el hilo de ordenamiento de manera asincrónica
 		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
 
 		do {
@@ -173,8 +183,71 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		/*Ordenador ordenador = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
 		ordenador.init();
-		ordenador.run();
+		ordenador.run();*/
+		frame = new Visualizador();
+		resetearArray();
+		frame.setLocationRelativeTo(null);
+	}
+	
+	public static void resetearArray(){
+		if (blnSort) return;
+		vecSort = new Integer[valorSort];
+		blockWidth = (int) Math.max(Math.floor(500/valorSort), 1);
+		for(int i = 0; i<vecSort.length; i++){
+			if (stepped) {
+				vecSort[i] = i;
+			} else {
+				vecSort[i] = (int) (valorSort*Math.random());
+			}
+		}
+		if (stepped) {
+			ArrayList<Integer> shuffleThis = new ArrayList<>();
+			for (int i = 0; i < vecSort.length; i++) {
+				shuffleThis.add(vecSort[i]);
+			}
+			Collections.shuffle(shuffleThis);
+			vecSort = shuffleThis.toArray(vecSort);
+		}
+		frame.PintarArray(vecSort);
+	}
+	
+	public static void startSort(String type){
+		
+		if (sortingThread == null || !blnSort){
+			
+			resetearArray();
+			
+			blnSort = true;
+
+			switch(type){
+			case "Burbujeo":
+				break;
+
+			case "Seleccion":
+				break;
+
+			case "Insercion":
+				break;
+
+			case "QuickSort":
+				break;
+				
+			case "MergeSort":
+				break;
+				
+			case "ShellSort":
+				break;
+				
+			default:
+				blnSort = false;
+				return;
+			}
+			
+			sortingThread.start();
+			
+		}
+		
 	}
 }
