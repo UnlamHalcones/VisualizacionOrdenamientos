@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,6 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSplitPane;
 
 import ar.edu.unlam.entidades.CasoOrdenamiento;
 import ar.edu.unlam.entidades.ElementState;
@@ -42,7 +44,10 @@ public class Ordenador extends JFrame implements Runnable {
 	private int loops = 0;
 
 	private List<Elemento> elementosAOrdenar;
+	
+	private JSplitPane panelContainer;
 	private PanelOrdenador panelOrdenador;
+	private PanelConfigurador panelConfigurador;
 
 	private CasoOrdenamiento casoDeOrdenamiento;
 	private int tiempoDemoraEntreOperacion;
@@ -86,8 +91,21 @@ public class Ordenador extends JFrame implements Runnable {
 		   }
 	
 	public void init() {
+		
+		panelContainer = new JSplitPane();
+		
+        getContentPane().setLayout(new GridLayout());
+        getContentPane().add(panelContainer);            
+
+        panelContainer.setOrientation(JSplitPane.VERTICAL_SPLIT); 
+        panelContainer.setDividerLocation(600);  
+        panelContainer.setEnabled(false);
+		
 		this.panelOrdenador = new PanelOrdenador();
-		add(panelOrdenador);
+		panelContainer.setTopComponent(panelOrdenador);
+		
+		this.panelConfigurador = new PanelConfigurador();
+		panelContainer.setBottomComponent(panelConfigurador);
 		
 		createMenuBar();
 		
@@ -96,6 +114,7 @@ public class Ordenador extends JFrame implements Runnable {
 		setLocationRelativeTo(null);
 		setVisible(true);
 		setFocusable(true);
+		setResizable(false);
 		requestFocusInWindow();
 	}
 	
@@ -366,7 +385,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	private void enableItems() {
-		panelOrdenador.runButton.setEnabled(true);
+		panelConfigurador.runButton.setEnabled(true);
 		algorithmsMenu.setEnabled(true);
 		complexityMenu.setEnabled(true);
 		itemsMenu.setEnabled(true);
@@ -401,35 +420,10 @@ public class Ordenador extends JFrame implements Runnable {
 	 * Clase usada para dibujar las barras de ordenamiento
 	 */
 	private class PanelOrdenador extends JPanel {
-
-		JButton runButton;
 		
 		public PanelOrdenador() {
 			this.setBackground(Color.BLACK);		
 
-		      runButton = new JButton("Start");
-	            runButton.addActionListener(new ActionListener() {
-	                public void actionPerformed(ActionEvent e) {
-	                    new Thread(new Runnable() {
-	                        public void run() {       	
-	                        	restartComponents();
-	                            Ordenador.getInstance().run();
-	                        }
-
-							private void restartComponents() {
-								runButton.setEnabled(false);
-	                    		algorithmsMenu.setEnabled(false);
-	                    		complexityMenu.setEnabled(false);
-	                    		itemsMenu.setEnabled(false);
-	                        	loops = 0;
-	                        	estrategiaOrdenamiento.setCantComparaciones(0);
-	                        	estrategiaOrdenamiento.setCantOperaciones(0);
-							}
-	                    }).start();
-	                }
-	            });
-	            this.add(runButton);	
-			
 		}
 
 		@Override
@@ -473,9 +467,40 @@ public class Ordenador extends JFrame implements Runnable {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(1200, 450);
+			return new Dimension(1500, 600);
 		}
 
+	}
+	
+	private class PanelConfigurador extends JPanel {
+		JButton runButton;
+		
+		public PanelConfigurador(){
+			this.setBackground(Color.BLACK);	
+			
+		     runButton = new JButton("Start");
+	            runButton.addActionListener(new ActionListener() {
+	                public void actionPerformed(ActionEvent e) {
+	                    new Thread(new Runnable() {
+	                        public void run() {       	
+	                        	restartComponents();
+	                            Ordenador.getInstance().run();
+	                        }
+
+							private void restartComponents() {
+								runButton.setEnabled(false);
+	                    		algorithmsMenu.setEnabled(false);
+	                    		complexityMenu.setEnabled(false);
+	                    		itemsMenu.setEnabled(false);
+	                        	loops = 0;
+	                        	estrategiaOrdenamiento.setCantComparaciones(0);
+	                        	estrategiaOrdenamiento.setCantOperaciones(0);
+							}
+	                    }).start();
+	                }
+	            });
+	            this.add(runButton);	
+		}
 	}
 
 	public int getTiempoDemoraEntreOperacion() {
@@ -487,9 +512,5 @@ public class Ordenador extends JFrame implements Runnable {
 		Ordenador ordenador = Ordenador.getInstance();
 		ordenador.init();
 
-	}
-	
-	
-
-	
+	}	
 }
