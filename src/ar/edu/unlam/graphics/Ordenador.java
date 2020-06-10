@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -12,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -41,11 +44,17 @@ public class Ordenador extends JFrame implements Runnable {
 	private List<Elemento> elementosAOrdenar;
 	private PanelOrdenador panelOrdenador;
 
+	private CasoOrdenamiento casoDeOrdenamiento;
 	private int tiempoDemoraEntreOperacion;
 	private int cantidadElementos;
 	private EstrategiaOrdenamiento estrategiaOrdenamiento;
 
 	private Map<MetodoOrdenamiento, EstrategiaOrdenamiento> mapaEstrategiaOrdenamiento;
+
+	JMenu algorithmsMenu;
+	JMenu complexityMenu;
+	JMenu itemsMenu;
+	
 
 	public Ordenador(int cantidadElementos, int tiempoDemoraEntreOperacion, CasoOrdenamiento casoOrdenamiento,
 			MetodoOrdenamiento metodoOrdenamiento) {
@@ -59,6 +68,7 @@ public class Ordenador extends JFrame implements Runnable {
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
 		this.cantidadElementos = cantidadElementos;
 		this.estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(metodoOrdenamiento);
+		this.casoDeOrdenamiento = casoOrdenamiento;
 
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
 		
@@ -66,19 +76,17 @@ public class Ordenador extends JFrame implements Runnable {
 		setLocationRelativeTo(null);
 	}
 	
-	   public static Ordenador getInstance() {
+	public static Ordenador getInstance() {
 
 		      if(_instance == null) {
-		         _instance = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		         _instance = new Ordenador(500, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.BURBUJEO);
 		      }
 
 		       return _instance;
 		   }
-
-
 	
 	public void init() {
-		panelOrdenador = new PanelOrdenador();
+		this.panelOrdenador = new PanelOrdenador();
 		add(panelOrdenador);
 		
 		createMenuBar();
@@ -95,9 +103,10 @@ public class Ordenador extends JFrame implements Runnable {
 
     	JMenuBar menuBar = new JMenuBar();
     	
+    	
     	//Algorithm Menu
-    	JMenu algorithmsMenu = new JMenu("Sorting Algorithms");
-
+    	 algorithmsMenu = new JMenu("Algoritmos");
+    	
     	ButtonGroup algorithmsGroup = new ButtonGroup();
 
     	JRadioButtonMenuItem burbujeoRMenuItem = new JRadioButtonMenuItem(MetodoOrdenamiento.BURBUJEO.name());
@@ -106,7 +115,7 @@ public class Ordenador extends JFrame implements Runnable {
 
         burbujeoRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.BURBUJEO);
+                this.estrategiaOrdenamiento = this.mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.BURBUJEO);
             }
         });
 
@@ -115,7 +124,7 @@ public class Ordenador extends JFrame implements Runnable {
 
         insercionRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.INSERCION);
+            	this.estrategiaOrdenamiento = this.mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.INSERCION);
             }
         });
 
@@ -124,7 +133,7 @@ public class Ordenador extends JFrame implements Runnable {
 
         seleccionRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.SELECCION);
+            	this.estrategiaOrdenamiento = this.mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.SELECCION);
             }
         });
         
@@ -133,7 +142,7 @@ public class Ordenador extends JFrame implements Runnable {
 
         quicksortRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.QUICKSORT);
+            	this.estrategiaOrdenamiento = this.mapaEstrategiaOrdenamiento.get(MetodoOrdenamiento.QUICKSORT);
             }
         });
 
@@ -146,7 +155,7 @@ public class Ordenador extends JFrame implements Runnable {
 
         
     	//Complexity Menu
-    	JMenu complexityMenu = new JMenu("Complexity");
+    	complexityMenu = new JMenu("Complejidad");
 
     	ButtonGroup complexityGroup = new ButtonGroup();
 
@@ -156,8 +165,9 @@ public class Ordenador extends JFrame implements Runnable {
 
     	aleatorioRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	elementosAOrdenar = GeneradorDeDatos.generarDatos(CasoOrdenamiento.ALEATORIO, cantidadElementos);
-            	panelOrdenador.repaint();
+            	this.casoDeOrdenamiento = CasoOrdenamiento.ALEATORIO;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
             }
         });
 
@@ -166,8 +176,9 @@ public class Ordenador extends JFrame implements Runnable {
 
         ordenadoRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	elementosAOrdenar = GeneradorDeDatos.generarDatos(CasoOrdenamiento.ORDENADO, cantidadElementos);
-            	panelOrdenador.repaint();            	
+            	this.casoDeOrdenamiento = CasoOrdenamiento.ORDENADO;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint(); 
             }
         });
 
@@ -176,8 +187,9 @@ public class Ordenador extends JFrame implements Runnable {
 
         invertidoRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	elementosAOrdenar = GeneradorDeDatos.generarDatos(CasoOrdenamiento.INVERTIDO, cantidadElementos);
-            	panelOrdenador.repaint();
+            	this.casoDeOrdenamiento = CasoOrdenamiento.INVERTIDO;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
             }
         });
         
@@ -186,8 +198,9 @@ public class Ordenador extends JFrame implements Runnable {
 
         casiOrdenadoRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	elementosAOrdenar = GeneradorDeDatos.generarDatos(CasoOrdenamiento.CASI_ORDENADO, cantidadElementos);
-            	panelOrdenador.repaint();
+            	this.casoDeOrdenamiento = CasoOrdenamiento.CASI_ORDENADO;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
             }
         });
 
@@ -196,8 +209,9 @@ public class Ordenador extends JFrame implements Runnable {
 
         casiInvertidioRMenuItem.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-            	elementosAOrdenar = GeneradorDeDatos.generarDatos(CasoOrdenamiento.CASI_INVERTIDO, cantidadElementos);
-            	panelOrdenador.repaint();
+            	this.casoDeOrdenamiento = CasoOrdenamiento.CASI_INVERTIDO;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
             }
         });
         
@@ -209,6 +223,124 @@ public class Ordenador extends JFrame implements Runnable {
 
         menuBar.add(complexityMenu);
 
+      //ItemsQty Menu
+    	itemsMenu = new JMenu("Elementos");
+
+    	ButtonGroup itemsGroup = new ButtonGroup();
+
+    	JRadioButtonMenuItem diezRMenuItem = new JRadioButtonMenuItem("10");
+    	itemsMenu.add(diezRMenuItem);
+
+    	diezRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.cantidadElementos = 10;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
+            }
+        });
+
+    	JRadioButtonMenuItem cincuentaRMenuItem = new JRadioButtonMenuItem("50");
+    	itemsMenu.add(cincuentaRMenuItem);
+
+    	cincuentaRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.cantidadElementos = 50;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
+            }
+        });
+    	
+    	JRadioButtonMenuItem cienRMenuItem = new JRadioButtonMenuItem("100");
+    	itemsMenu.add(cienRMenuItem);
+
+    	cienRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.cantidadElementos = 100;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
+            }
+        });
+    	
+    	JRadioButtonMenuItem dcRMenuItem = new JRadioButtonMenuItem("250");
+    	itemsMenu.add(dcRMenuItem);
+
+    	dcRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.cantidadElementos = 250;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
+            }
+        });
+
+    	JRadioButtonMenuItem quinientosRMenuItem = new JRadioButtonMenuItem("500");
+    	quinientosRMenuItem.setSelected(true);
+    	itemsMenu.add(quinientosRMenuItem);
+
+    	quinientosRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.cantidadElementos = 500;
+            	this.elementosAOrdenar = GeneradorDeDatos.generarDatos(this.casoDeOrdenamiento, this.cantidadElementos);
+            	this.panelOrdenador.repaint();
+            }
+        });
+        
+    	itemsGroup.add(diezRMenuItem);
+        itemsGroup.add(cincuentaRMenuItem);
+        itemsGroup.add(cienRMenuItem);
+        itemsGroup.add(dcRMenuItem);
+        itemsGroup.add(quinientosRMenuItem);
+        
+        menuBar.add(itemsMenu);
+        
+        //ItemsQty Menu
+    	JMenu operationsMenu = new JMenu("Tiempo entre Operaciones");
+
+    	ButtonGroup operationsGroup = new ButtonGroup();
+
+    	JRadioButtonMenuItem aRMenuItem = new JRadioButtonMenuItem("10ms");
+    	operationsMenu.add(aRMenuItem);
+
+    	aRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.tiempoDemoraEntreOperacion = 10;
+            }
+        });
+    	
+    	JRadioButtonMenuItem bRMenuItem = new JRadioButtonMenuItem("50ms");
+    	operationsMenu.add(bRMenuItem);
+
+    	bRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.tiempoDemoraEntreOperacion = 50;
+            }
+        });
+    	
+    	JRadioButtonMenuItem cRMenuItem = new JRadioButtonMenuItem("100ms");
+    	cRMenuItem.setSelected(true);
+    	operationsMenu.add(cRMenuItem);
+
+    	cRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.tiempoDemoraEntreOperacion = 100;
+            }
+        });
+    	
+    	JRadioButtonMenuItem dRMenuItem = new JRadioButtonMenuItem("200ms");
+    	operationsMenu.add(dRMenuItem);
+
+    	dRMenuItem.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+            	this.tiempoDemoraEntreOperacion = 200;
+            }
+        });
+        
+    	operationsGroup.add(aRMenuItem);
+    	operationsGroup.add(bRMenuItem);
+    	operationsGroup.add(cRMenuItem);
+    	operationsGroup.add(dRMenuItem);
+        
+        menuBar.add(operationsMenu);
+    	
         setJMenuBar(menuBar);
         
         
@@ -229,7 +361,15 @@ public class Ordenador extends JFrame implements Runnable {
 				next_game_tick += SKIP_TICKS;
 			}
 		} while (!futureOrdenamiento.isDone());
+		enableItems();
 		display();
+	}
+
+	private void enableItems() {
+		panelOrdenador.runButton.setEnabled(true);
+		algorithmsMenu.setEnabled(true);
+		complexityMenu.setEnabled(true);
+		itemsMenu.setEnabled(true);
 	}
 
 	public void display(){
@@ -262,8 +402,33 @@ public class Ordenador extends JFrame implements Runnable {
 	 */
 	private class PanelOrdenador extends JPanel {
 
+		JButton runButton;
+		
 		public PanelOrdenador() {
 			this.setBackground(Color.BLACK);		
+
+		      runButton = new JButton("Start");
+	            runButton.addActionListener(new ActionListener() {
+	                public void actionPerformed(ActionEvent e) {
+	                    new Thread(new Runnable() {
+	                        public void run() {       	
+	                        	restartComponents();
+	                            Ordenador.getInstance().run();
+	                        }
+
+							private void restartComponents() {
+								runButton.setEnabled(false);
+	                    		algorithmsMenu.setEnabled(false);
+	                    		complexityMenu.setEnabled(false);
+	                    		itemsMenu.setEnabled(false);
+	                        	loops = 0;
+	                        	estrategiaOrdenamiento.setCantComparaciones(0);
+	                        	estrategiaOrdenamiento.setCantOperaciones(0);
+							}
+	                    }).start();
+	                }
+	            });
+	            this.add(runButton);	
 			
 		}
 
@@ -318,14 +483,9 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-
-		//		Ordenador ordenador =  new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
-//		ordenador.init();
-//		ordenador.run();
 		
 		Ordenador ordenador = Ordenador.getInstance();
 		ordenador.init();
-//		ordenador.run();
 
 	}
 	
