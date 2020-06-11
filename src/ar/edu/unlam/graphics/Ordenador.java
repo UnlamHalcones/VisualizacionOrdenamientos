@@ -106,20 +106,6 @@ public class Ordenador extends JFrame implements Runnable {
 		elementosAOrdenar.forEach(element -> element.setState(ElementState.INICIAL));
 	}
 
-	public void display(int actual, int comparado, int indice) {
-		resetElementsColor(indice);
-		elementosAOrdenar.get(actual).setState(ElementState.ACTUAL);
-		elementosAOrdenar.get(comparado).setState(ElementState.COMPARADOR);
-		panelOrdenador.repaint();
-	}
-	private void resetElementsColor(int indice) {
-		for(int i = 0; i < indice ; i++) {
-			elementosAOrdenar.get(i).setState(ElementState.ORDENADO);
-		}
-	}
-	
-
-
 	public void sleep() {
 		try {
 			Thread.sleep(this.getTiempoDemoraEntreOperacion());
@@ -158,6 +144,7 @@ public class Ordenador extends JFrame implements Runnable {
 			double i = 0;
 
 			double anchoBarra = currentDimension.getWidth() / elementosAOrdenar.size();
+			
 			for (Elemento elemento : elementosAOrdenar) {
 				AffineTransform old = g2.getTransform();
 
@@ -187,7 +174,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(100, 50, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
+		Ordenador ordenador = new Ordenador(500, 1, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
 		ordenador.init();
 		ordenador.run();
 	}
