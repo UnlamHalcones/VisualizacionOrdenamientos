@@ -164,7 +164,7 @@ public class Ordenador extends JFrame implements Runnable {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(1200, 450);
+			return new Dimension(1200, 800);
 		}
 
 	}
@@ -174,7 +174,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(500, 1, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
+		Ordenador ordenador = new Ordenador(500, 10, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
 		ordenador.init();
 		ordenador.run();
 	}
