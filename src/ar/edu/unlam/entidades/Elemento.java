@@ -5,6 +5,7 @@ public class Elemento implements Comparable<Elemento> {
 	private int valor;
 	private ElementState state;
 
+
 	public Elemento(int valor) {
 		super();
 		this.valor = valor;
@@ -27,5 +28,7 @@ public class Elemento implements Comparable<Elemento> {
 	public void setState(ElementState state) {
 		this.state = state;
 	}
+	
 
+	
 }
