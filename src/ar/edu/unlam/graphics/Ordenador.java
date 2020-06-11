@@ -89,7 +89,7 @@ public class Ordenador extends JFrame implements Runnable {
 		} while (!futureOrdenamiento.isDone());
 		display();
 	}
-
+	
 	public void display(){
 		elementosAOrdenar.forEach(elemento -> elemento.setState(ElementState.ORDENADO));
 		panelOrdenador.repaint();
@@ -101,10 +101,24 @@ public class Ordenador extends JFrame implements Runnable {
 		elementosAOrdenar.get(comparado).setState(ElementState.COMPARADOR);
 		panelOrdenador.repaint();
 	}
-
+	
 	private void resetElementsColor() {
 		elementosAOrdenar.forEach(element -> element.setState(ElementState.INICIAL));
 	}
+
+	public void display(int actual, int comparado, int indice) {
+		resetElementsColor(indice);
+		elementosAOrdenar.get(actual).setState(ElementState.ACTUAL);
+		elementosAOrdenar.get(comparado).setState(ElementState.COMPARADOR);
+		panelOrdenador.repaint();
+	}
+	private void resetElementsColor(int indice) {
+		for(int i = 0; i < indice ; i++) {
+			elementosAOrdenar.get(i).setState(ElementState.ORDENADO);
+		}
+	}
+	
+
 
 	public void sleep() {
 		try {
@@ -139,7 +153,7 @@ public class Ordenador extends JFrame implements Runnable {
 			g2.drawString("Comparaciones: " + String.format("%6s", estrategiaOrdenamiento.getCantComparaciones()), 420, 25);
 
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
-			g2.drawString("Intercambios: " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
+			g2.drawString(estrategiaOrdenamiento.getOperacion() + ": " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
 
 			double i = 0;
 
@@ -173,7 +187,7 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(450, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.QUICKSORT);
+		Ordenador ordenador = new Ordenador(100, 50, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
 		ordenador.init();
 		ordenador.run();
 	}
