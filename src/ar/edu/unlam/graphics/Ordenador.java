@@ -46,7 +46,6 @@ public class Ordenador extends JFrame implements Runnable {
 	private final int HEIGHT = 450;
 
 	private static Ordenador _instance;
-	CompletableFuture<Void> futureOrdenamiento;
 	Thread hilo;
 	Thread hiloOrdenamiento;
 	
@@ -127,7 +126,7 @@ public class Ordenador extends JFrame implements Runnable {
 		
 		hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
 		// Corro el hilo de ordenamiento de manera asincrónica
-		futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
+		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
 
 		do {
 			if (System.currentTimeMillis() > next_game_tick) {
@@ -138,12 +137,6 @@ public class Ordenador extends JFrame implements Runnable {
 		
 		enableItems();
 		display();
-		try {
-			hilo.sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	private void enableItems() {
@@ -372,7 +365,6 @@ public class Ordenador extends JFrame implements Runnable {
 										validate();
 										Ordenador ordenador = Ordenador.getInstance();
 										ordenador.metodoOrdenamiento = s; 
-										ordenador.casoDeOrdenamiento = CasoOrdenamiento.values()[new Random().nextInt(CasoOrdenamiento.values().length)];
 										ordenador.elementosAOrdenar = GeneradorDeDatos
 												.generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
 										Ordenador.getInstance().run();
