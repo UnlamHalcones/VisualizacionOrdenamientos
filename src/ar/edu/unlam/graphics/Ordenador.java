@@ -5,14 +5,28 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import ar.edu.unlam.entidades.CasoOrdenamiento;
 import ar.edu.unlam.entidades.ElementState;
@@ -30,13 +44,20 @@ public class Ordenador extends JFrame implements Runnable {
 	private final int WIDTH = 1200;
 	private final int HEIGHT = 450;
 
+	 private static Ordenador _instance;
+	
 	private int loops = 0;
 
 	private List<Elemento> elementosAOrdenar;
+	
+	private JSplitPane panelContainer;
 	private PanelOrdenador panelOrdenador;
+	private PanelConfigurador panelConfigurador;
 
+	private CasoOrdenamiento casoDeOrdenamiento;
+	private MetodoOrdenamiento metodoOrdenamiento;
 	private int tiempoDemoraEntreOperacion;
-
+	private int cantidadElementos;
 	private EstrategiaOrdenamiento estrategiaOrdenamiento;
 
 	private Map<MetodoOrdenamiento, EstrategiaOrdenamiento> mapaEstrategiaOrdenamiento;
@@ -51,24 +72,47 @@ public class Ordenador extends JFrame implements Runnable {
 		mapaEstrategiaOrdenamiento.put(MetodoOrdenamiento.SELECCION, new Seleccion(this));
 
 		this.tiempoDemoraEntreOperacion = tiempoDemoraEntreOperacion;
-
+		this.cantidadElementos = cantidadElementos;
 		this.estrategiaOrdenamiento = mapaEstrategiaOrdenamiento.get(metodoOrdenamiento);
-
+		this.casoDeOrdenamiento = casoOrdenamiento;
+		this.metodoOrdenamiento = metodoOrdenamiento;
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
-
+		
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
 	}
+	
+	public static Ordenador getInstance() {
 
+		      if(_instance == null) {
+		         _instance = new Ordenador(250, 100, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.BURBUJEO);
+		      }
+
+		       return _instance;
+		   }
+	
 	public void init() {
-		panelOrdenador = new PanelOrdenador();
-		add(panelOrdenador);
+		
+		panelContainer = new JSplitPane();
+		
+        getContentPane().setLayout(new GridLayout());
+        getContentPane().add(panelContainer);            
 
+        panelContainer.setOrientation(JSplitPane.VERTICAL_SPLIT); 
+        panelContainer.setDividerLocation(600);  
+        panelContainer.setEnabled(false);
+		
+		this.panelOrdenador = new PanelOrdenador();
+		panelContainer.setTopComponent(panelOrdenador);
+		
+		this.panelConfigurador = new PanelConfigurador(panelOrdenador);
+		panelContainer.setBottomComponent(panelConfigurador);
 		pack();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setVisible(true);
 		setFocusable(true);
+		setResizable(false);
 		requestFocusInWindow();
 	}
 
@@ -87,9 +131,18 @@ public class Ordenador extends JFrame implements Runnable {
 				next_game_tick += SKIP_TICKS;
 			}
 		} while (!futureOrdenamiento.isDone());
+		enableItems();
 		display();
 	}
-	
+
+	private void enableItems() {
+		panelConfigurador.runButton.setEnabled(true);
+		panelConfigurador.algoritmoCB.setEnabled(true);
+		panelConfigurador.elementosSlider.setEnabled(true);
+		panelConfigurador.velocidadSlider.setEnabled(true);
+		panelConfigurador.casoOrdenamientoCB.setEnabled(true);
+	}
+
 	public void display(){
 		elementosAOrdenar.forEach(elemento -> elemento.setState(ElementState.ORDENADO));
 		panelOrdenador.repaint();
@@ -119,9 +172,10 @@ public class Ordenador extends JFrame implements Runnable {
 	 * Clase usada para dibujar las barras de ordenamiento
 	 */
 	private class PanelOrdenador extends JPanel {
-
+		
 		public PanelOrdenador() {
-			this.setBackground(Color.BLACK);
+			this.setBackground(Color.BLACK);		
+
 		}
 
 		@Override
@@ -141,6 +195,8 @@ public class Ordenador extends JFrame implements Runnable {
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
 			g2.drawString(estrategiaOrdenamiento.getOperacion() + ": " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
 
+	   
+			
 			double i = 0;
 
 			double anchoBarra = currentDimension.getWidth() / elementosAOrdenar.size();
@@ -164,9 +220,126 @@ public class Ordenador extends JFrame implements Runnable {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(1200, 800);
+			return new Dimension(1500, 600);
 		}
 
+	}
+	
+	private class PanelConfigurador extends JPanel {
+		JButton runButton;
+		
+		private JSlider velocidadSlider;
+		private final int VEL_MAX = 500;
+		private final int VEL_MIN = 1;
+		private final int VEL_DEF = 100;
+		
+		private JSlider elementosSlider;
+		private final int TAM_MAX = 500;
+		private final int TAM_MIN = 1;
+		private final int TAM_DEF = 250;
+		
+		private JLabel velocidadDef;
+		private JLabel tamanioDef;
+		
+
+		private JComboBox<String> algoritmoCB;
+		private JComboBox<String> casoOrdenamientoCB;
+		
+
+		public PanelConfigurador(JPanel panelOrdenador){
+			this.setBackground(Color.white);	
+//			this.panelOrdenador = panelOrdenador;
+			
+
+			algoritmoCB = new JComboBox<String>();
+			for(MetodoOrdenamiento s : MetodoOrdenamiento.values()) algoritmoCB.addItem(s.name());
+			algoritmoCB.setSelectedItem("Burbujeo");
+			algoritmoCB.addActionListener (new ActionListener () {
+			    public void actionPerformed(ActionEvent e) {
+			        Ordenador ordenador = Ordenador.getInstance();
+			        ordenador.metodoOrdenamiento = MetodoOrdenamiento.valueOf(algoritmoCB.getSelectedItem().toString());
+			        ordenador.estrategiaOrdenamiento = ordenador.mapaEstrategiaOrdenamiento.get(ordenador.metodoOrdenamiento);
+			    }
+			});
+			
+			casoOrdenamientoCB = new JComboBox<String>();
+			for(CasoOrdenamiento s : CasoOrdenamiento.values()) casoOrdenamientoCB.addItem(s.name());
+			casoOrdenamientoCB.setSelectedItem("ALEATORIO");
+			casoOrdenamientoCB.addActionListener (new ActionListener () {
+			    public void actionPerformed(ActionEvent e) {
+			        Ordenador ordenador = Ordenador.getInstance();
+			        ordenador.casoDeOrdenamiento = CasoOrdenamiento.valueOf(casoOrdenamientoCB.getSelectedItem().toString());
+					ordenador.elementosAOrdenar = GeneradorDeDatos.generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
+					panelOrdenador.repaint();
+			    }
+			});
+						
+			velocidadSlider = new JSlider(VEL_MIN, VEL_MAX, VEL_DEF);
+			elementosSlider = new JSlider(TAM_MIN, TAM_MAX, TAM_DEF);
+			
+			velocidadSlider.setMinorTickSpacing(10);
+			velocidadSlider.setMajorTickSpacing(100);
+			velocidadSlider.setPaintTicks(true);
+			velocidadSlider.setOpaque(false);
+			
+			velocidadDef = new JLabel("Velocidad: "+ VEL_DEF +" ms");
+			tamanioDef = new JLabel("Tamanio: "+ TAM_DEF +" elementos");
+			
+			velocidadSlider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) {
+					velocidadDef.setText(("Velocidad: " + Integer.toString(velocidadSlider.getValue()) + "ms"));
+					validate();
+					Ordenador.getInstance().tiempoDemoraEntreOperacion = velocidadSlider.getValue();
+				}
+			});
+			
+			elementosSlider.setMinorTickSpacing(10);
+			elementosSlider.setMajorTickSpacing(100);
+			elementosSlider.setPaintTicks(true);
+			elementosSlider.setOpaque(false);
+			
+			elementosSlider.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) {
+					tamanioDef.setText(("Tamanio: " + Integer.toString(elementosSlider.getValue()) + " elementos"));
+					validate();
+					Ordenador ordenador = Ordenador.getInstance();
+					ordenador.cantidadElementos = elementosSlider.getValue();
+					ordenador.elementosAOrdenar = GeneradorDeDatos.generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
+					panelOrdenador.repaint();
+				}
+			});
+			
+		     runButton = new JButton("Start");
+	            runButton.addActionListener(new ActionListener() {
+	                public void actionPerformed(ActionEvent e) {
+	                    new Thread(new Runnable() {
+	                        public void run() {       	
+	                        	restartComponents();
+	                            Ordenador.getInstance().run();
+	                        }
+
+							private void restartComponents() {
+								runButton.setEnabled(false);
+	                    		elementosSlider.setEnabled(false);
+	                    		velocidadSlider.setEnabled(false);
+	                    		algoritmoCB.setEnabled(false);
+	                    		casoOrdenamientoCB.setEnabled(false);
+	                        	loops = 0;
+	                        	estrategiaOrdenamiento.setCantComparaciones(0);
+	                        	estrategiaOrdenamiento.setCantOperaciones(0);
+							}
+	                    }).start();
+	                }
+	            });
+	            
+	            this.add(algoritmoCB);
+	            this.add(casoOrdenamientoCB);
+	    		this.add(tamanioDef);
+	    		this.add(elementosSlider);
+	    		this.add(velocidadDef);
+	    		this.add(velocidadSlider);
+	            this.add(runButton);	
+		}
 	}
 
 	public int getTiempoDemoraEntreOperacion() {
@@ -174,8 +347,9 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Ordenador ordenador = new Ordenador(500, 10, CasoOrdenamiento.ALEATORIO, MetodoOrdenamiento.INSERCION);
+		
+		Ordenador ordenador = Ordenador.getInstance();
 		ordenador.init();
-		ordenador.run();
-	}
+
+	}	
 }

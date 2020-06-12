@@ -6,6 +6,8 @@ import java.util.List;
 
 public abstract class EstrategiaOrdenamiento<T extends Comparable<T>> {
 
+
+
 	Ordenador jFrameOrdenador;
 	int cantComparaciones;
 	int cantOperaciones;
@@ -27,6 +29,10 @@ public abstract class EstrategiaOrdenamiento<T extends Comparable<T>> {
 		return cantComparaciones;
 	}
 
+	public void setCantComparaciones(int cantComparaciones) {
+		this.cantComparaciones = cantComparaciones;
+	}
+
 	public int getCantOperaciones() {
 		return cantOperaciones;
 	}
@@ -37,5 +43,9 @@ public abstract class EstrategiaOrdenamiento<T extends Comparable<T>> {
 
 	public void setOperacion(String operacion) {
 		this.operacion = operacion;
+	}
+
+	public void setCantOperaciones(int cantOperaciones) {
+		this.cantOperaciones = cantOperaciones;
 	}
 }
