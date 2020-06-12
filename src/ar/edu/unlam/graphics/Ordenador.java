@@ -8,21 +8,16 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.event.ChangeEvent;
@@ -38,6 +33,10 @@ import ar.edu.unlam.ordenamientos.*;
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4990398798328871483L;
 	private final int SECOND = 1000;
 	private final int TICKS_PER_SECOND = 1000;
 	private final int SKIP_TICKS = SECOND / TICKS_PER_SECOND;
@@ -173,6 +172,11 @@ public class Ordenador extends JFrame implements Runnable {
 	 */
 	private class PanelOrdenador extends JPanel {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7342941346106790043L;
+
 		public PanelOrdenador() {
 			this.setBackground(Color.BLACK);		
 
@@ -226,6 +230,11 @@ public class Ordenador extends JFrame implements Runnable {
 	}
 	
 	private class PanelConfigurador extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -539665950396434443L;
+
 		JButton runButton;
 		
 		private JSlider velocidadSlider;
