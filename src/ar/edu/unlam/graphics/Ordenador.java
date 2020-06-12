@@ -8,22 +8,16 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.event.ChangeEvent;
@@ -243,7 +237,7 @@ public class Ordenador extends JFrame implements Runnable {
 
 		@Override
 		public Dimension getPreferredSize() {
-			return new Dimension(1500, 600);
+			return new Dimension(1000, 600);
 		}
 
 	}
@@ -309,7 +303,7 @@ public class Ordenador extends JFrame implements Runnable {
 			velocidadSlider.setOpaque(false);
 			
 			velocidadDef = new JLabel("Velocidad: "+ VEL_DEF +" ms");
-			tamanioDef = new JLabel("Tama\F1o: "+ TAM_DEF +" elementos");
+			tamanioDef = new JLabel("Tamano: "+ TAM_DEF +" elementos");
 			
 			velocidadSlider.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent arg0) {
