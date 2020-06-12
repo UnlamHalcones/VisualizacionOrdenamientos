@@ -20,11 +20,13 @@ el proceso de ordenamiento.
 	- ROJO: elemento actualmente comparado.
 	- VERDE: elemento ya ordenado.
 
-- En seccion superior de la ventana disponemos de tres contadores refrescados durante la ejecucion del programa:
+- En seccion superior de la ventana disponemos de cinco contadores refrescados durante la ejecucion del programa:
 
-	- Time: tiempo transcurrido durante el proceso de ordenamiento
+	- Tiempo: tiempo transcurrido durante el proceso de ordenamiento
 	- Comparaciones: cantidad de comparaciones realizadas.
 	- Intercambios: cantidad de intercambios realizados.
+	- Algoritmo: muestra el algoritmo que fue seleccionado. Al ejecutar la opción de correr todos los algoritmos va a mostrar el que se esté ejecutando.
+	- Caso: muestra el caso que fue seleccionado. Al ejecutar la opción de correr todos los algoritmos va a mostrar el que haya sido seleccionado por el programa. Será random.
 ---------
 
 **Instrucciones de Uso:**
@@ -46,6 +48,10 @@ el proceso de ordenamiento.
 **4.** 4ta opcion nos permite setear el tiempo que demora entre cada operacion (mili segundos).
 
 **5.** Luego de setear, se puede presionar el boton Start para iniciar el ordenamiento.
+
+**6.** Luego de setear, se puede presionar el boton Start All para iniciar el ordenamiento. En este caso va a ejecutar todos los algoritmos.
+
+**7.** Luego de setear Start o Start All se habilita el botón Stop. Su función es la de detener la ejecución del algoritmo que se esté ejecutando.
 
 Desarrollado por Halcones.
 ---

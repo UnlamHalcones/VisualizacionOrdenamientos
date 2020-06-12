@@ -12,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
 import javax.swing.ButtonGroup;
@@ -44,7 +45,10 @@ public class Ordenador extends JFrame implements Runnable {
 	private final int WIDTH = 1200;
 	private final int HEIGHT = 450;
 
-	 private static Ordenador _instance;
+	private static Ordenador _instance;
+	CompletableFuture<Void> futureOrdenamiento;
+	Thread hilo;
+	Thread hiloOrdenamiento;
 	
 	private int loops = 0;
 
@@ -121,9 +125,9 @@ public class Ordenador extends JFrame implements Runnable {
 
 		long next_game_tick = System.currentTimeMillis();
 		
-		Thread hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
+		hiloOrdenamiento = new Thread(() -> estrategiaOrdenamiento.ordenar(elementosAOrdenar));
 		// Corro el hilo de ordenamiento de manera asincrÃ³nica
-		CompletableFuture<Void> futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
+		futureOrdenamiento = CompletableFuture.runAsync(hiloOrdenamiento);
 
 		do {
 			if (System.currentTimeMillis() > next_game_tick) {
@@ -131,12 +135,21 @@ public class Ordenador extends JFrame implements Runnable {
 				next_game_tick += SKIP_TICKS;
 			}
 		} while (!futureOrdenamiento.isDone());
+		
 		enableItems();
 		display();
+		try {
+			hilo.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void enableItems() {
 		panelConfigurador.runButton.setEnabled(true);
+		panelConfigurador.runAllButton.setEnabled(true);
+		panelConfigurador.stopButton.setEnabled(false);
 		panelConfigurador.algoritmoCB.setEnabled(true);
 		panelConfigurador.elementosSlider.setEnabled(true);
 		panelConfigurador.velocidadSlider.setEnabled(true);
@@ -187,15 +200,20 @@ public class Ordenador extends JFrame implements Runnable {
 			Dimension currentDimension = getContentPane().getSize();
 
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
-			g2.drawString("Time: " + String.format("%6s", loops * SKIP_TICKS) + "ms", 20, 25);
+			g2.drawString("Tiempo: " + String.format("%6s", loops * SKIP_TICKS) + "ms", 20, 25);
 
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
 			g2.drawString("Comparaciones: " + String.format("%6s", estrategiaOrdenamiento.getCantComparaciones()), 420, 25);
 
 			g2.setFont(new Font("Dialog", Font.BOLD, 24));
 			g2.drawString("Intercambios: " + String.format("%6s", estrategiaOrdenamiento.getCantOperaciones()), 820, 25);
-
 	   
+			g2.setFont(new Font("Dialog", Font.BOLD, 24));
+			g2.drawString("Algoritmo: " + String.format("%-9s", metodoOrdenamiento), 20, 50);
+			
+			g2.setFont(new Font("Dialog", Font.BOLD, 24));
+			g2.drawString("Caso: " + String.format("%-9s", casoDeOrdenamiento), 420, 50);
+
 			
 			double i = 0;
 
@@ -226,6 +244,8 @@ public class Ordenador extends JFrame implements Runnable {
 	
 	private class PanelConfigurador extends JPanel {
 		JButton runButton;
+		JButton runAllButton;
+		JButton stopButton;
 		
 		private JSlider velocidadSlider;
 		private final int VEL_MAX = 500;
@@ -258,6 +278,7 @@ public class Ordenador extends JFrame implements Runnable {
 			        Ordenador ordenador = Ordenador.getInstance();
 			        ordenador.metodoOrdenamiento = MetodoOrdenamiento.valueOf(algoritmoCB.getSelectedItem().toString());
 			        ordenador.estrategiaOrdenamiento = ordenador.mapaEstrategiaOrdenamiento.get(ordenador.metodoOrdenamiento);
+			        panelOrdenador.repaint();
 			    }
 			});
 			
@@ -282,7 +303,7 @@ public class Ordenador extends JFrame implements Runnable {
 			velocidadSlider.setOpaque(false);
 			
 			velocidadDef = new JLabel("Velocidad: "+ VEL_DEF +" ms");
-			tamanioDef = new JLabel("Tamanio: "+ TAM_DEF +" elementos");
+			tamanioDef = new JLabel("Tamaño: "+ TAM_DEF +" elementos");
 			
 			velocidadSlider.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent arg0) {
@@ -311,25 +332,83 @@ public class Ordenador extends JFrame implements Runnable {
 		     runButton = new JButton("Start");
 	            runButton.addActionListener(new ActionListener() {
 	                public void actionPerformed(ActionEvent e) {
-	                    new Thread(new Runnable() {
-	                        public void run() {       	
-	                        	restartComponents();
-	                            Ordenador.getInstance().run();
-	                        }
+	                	
+						Thread hilo = new Thread(new Runnable() {
+
+							public void run() {
+								restartComponents();
+								validate();
+								Ordenador ordenador = Ordenador.getInstance();
+								ordenador.elementosAOrdenar = GeneradorDeDatos
+										.generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
+								Ordenador.getInstance().run();
+							}
 
 							private void restartComponents() {
 								runButton.setEnabled(false);
-	                    		elementosSlider.setEnabled(false);
-	                    		velocidadSlider.setEnabled(false);
-	                    		algoritmoCB.setEnabled(false);
-	                    		casoOrdenamientoCB.setEnabled(false);
-	                        	loops = 0;
-	                        	estrategiaOrdenamiento.setCantComparaciones(0);
-	                        	estrategiaOrdenamiento.setCantOperaciones(0);
+								stopButton.setEnabled(true);
+								elementosSlider.setEnabled(false);
+								velocidadSlider.setEnabled(false);
+								algoritmoCB.setEnabled(false);
+								casoOrdenamientoCB.setEnabled(false);
+								loops = 0;
+								estrategiaOrdenamiento.setCantComparaciones(0);
+								estrategiaOrdenamiento.setCantOperaciones(0);
 							}
-	                    }).start();
+						});
+						hilo.start();
 	                }
 	            });
+	            
+	            runAllButton = new JButton("Start All");
+	            	runAllButton.addActionListener(new ActionListener() {
+		                public void actionPerformed(ActionEvent e) {
+		                	
+							Thread hilo = new Thread(new Runnable() {
+
+								public void run() {
+									for(MetodoOrdenamiento s : MetodoOrdenamiento.values()) {
+										restartComponents();
+										validate();
+										Ordenador ordenador = Ordenador.getInstance();
+										ordenador.metodoOrdenamiento = s; 
+										ordenador.casoDeOrdenamiento = CasoOrdenamiento.values()[new Random().nextInt(CasoOrdenamiento.values().length)];
+										ordenador.elementosAOrdenar = GeneradorDeDatos
+												.generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
+										Ordenador.getInstance().run();
+									}
+								}
+
+								private void restartComponents() {
+									runAllButton.setEnabled(false);
+									runButton.setEnabled(false);
+									stopButton.setEnabled(true);
+									elementosSlider.setEnabled(false);
+									velocidadSlider.setEnabled(false);
+									algoritmoCB.setEnabled(false);
+									casoOrdenamientoCB.setEnabled(false);
+									loops = 0;
+									estrategiaOrdenamiento.setCantComparaciones(0);
+									estrategiaOrdenamiento.setCantOperaciones(0);
+								}
+							});
+							hilo.start();
+		                }
+		            });
+	            
+	            stopButton = new JButton("Stop");
+	            stopButton.setEnabled(false);
+	            stopButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {
+							hiloOrdenamiento.sleep(100);
+							hilo.sleep(100);
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				});
 	            
 	            this.add(algoritmoCB);
 	            this.add(casoOrdenamientoCB);
@@ -337,7 +416,9 @@ public class Ordenador extends JFrame implements Runnable {
 	    		this.add(elementosSlider);
 	    		this.add(velocidadDef);
 	    		this.add(velocidadSlider);
-	            this.add(runButton);	
+	            this.add(runButton);
+	            this.add(runAllButton);
+	            this.add(stopButton);
 		}
 	}
 
