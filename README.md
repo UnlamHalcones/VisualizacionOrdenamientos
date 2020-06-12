@@ -49,10 +49,10 @@ el proceso de ordenamiento.
 
 Desarrollado por Halcones.
 ---
-# Autores: 
-	- Nicolas Carlos C.
-	- Héctor Marcelo G.
-	- Domingo M., Francisco P.
-	- Federico Martin M.
-	- Martin P.
-	- Tomas D.
+## Autores: 
+	* Nicolas Carlos C.
+	* Héctor Marcelo G.
+	* Domingo M., Francisco P.
+	* Federico Martin M.
+	* Martin P.
+	* Tomas D.
