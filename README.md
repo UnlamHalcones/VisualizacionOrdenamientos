@@ -48,6 +48,11 @@ el proceso de ordenamiento.
 **5.** Luego de setear, se puede presionar el boton Start para iniciar el ordenamiento.
 
 Desarrollado por Halcones.
-
-
-
+---
+# Autores: 
+	- Nicolas Carlos C.
+	- Héctor Marcelo G.
+	- Domingo M., Francisco P.
+	- Federico Martin M.
+	- Martin P.
+	- Tomas D.
