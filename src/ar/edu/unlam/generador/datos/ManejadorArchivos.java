@@ -1,27 +1,37 @@
 package ar.edu.unlam.generador.datos;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public abstract class ManejadorArchivos {
 
-	public static void agregarRegistro(String linea) {
+	private static String directoryName = "Informacion Estadistica";
 
-		String path = "src\\Informacion Estadistica\\registro.csv";
+	public static void agregarRegistro(String linea) {
+		checkFolder();
+
+		String path = directoryName + "\\registro.csv";
 		BufferedWriter out;
-		
-		try {   
-		    out = new BufferedWriter(new FileWriter(path, true));   
-		    out.write(linea+"\n");   
-		    out.close();   
-		} catch (IOException e) {   
-		    // error processing code   
+
+		try {
+			out = new BufferedWriter(new FileWriter(path, true));
+			out.write(linea + "\n");
+			out.close();
+		} catch (IOException e) {
+			// error processing code
 			System.out.println("Error al leer el archivo");
-			
-		    }   
-			
-		System.out.println(linea);
+
+		}
+
+	}
+
+	private static void checkFolder() {
+		File directory = new File(directoryName);
+		if (!directory.exists()) {
+			directory.mkdir();
+		}
 	}
 
 }
