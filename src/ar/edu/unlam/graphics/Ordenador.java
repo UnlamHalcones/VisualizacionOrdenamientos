@@ -29,6 +29,7 @@ import ar.edu.unlam.entidades.Elemento;
 import ar.edu.unlam.entidades.MetodoOrdenamiento;
 import ar.edu.unlam.generador.datos.GeneradorDeDatos;
 import ar.edu.unlam.ordenamientos.*;
+import ar.edu.unlam.generador.datos.ManejadorArchivos;
 
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
@@ -46,7 +47,9 @@ public class Ordenador extends JFrame implements Runnable {
 	 private static Ordenador _instance;
 	
 	private int loops = 0;
-
+	
+	private CasoOrdenamiento casoOrdenamiento;
+	
 	private List<Elemento> elementosAOrdenar;
 	
 	private JSplitPane panelContainer;
@@ -76,6 +79,8 @@ public class Ordenador extends JFrame implements Runnable {
 		this.casoDeOrdenamiento = casoOrdenamiento;
 		this.metodoOrdenamiento = metodoOrdenamiento;
 		this.elementosAOrdenar = GeneradorDeDatos.generarDatos(casoOrdenamiento, cantidadElementos);
+		
+		this.casoOrdenamiento=casoOrdenamiento;
 		
 		setSize(WIDTH, HEIGHT);
 		setLocationRelativeTo(null);
@@ -132,6 +137,7 @@ public class Ordenador extends JFrame implements Runnable {
 		} while (!futureOrdenamiento.isDone());
 		enableItems();
 		display();
+		guardarRegistro();
 	}
 
 	private void enableItems() {
@@ -165,6 +171,12 @@ public class Ordenador extends JFrame implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void guardarRegistro () {
+		
+		String linea = this.estrategiaOrdenamiento.getClass().toString().substring(33).toLowerCase()+";"+this.casoOrdenamiento.toString().toLowerCase()+";"+this.elementosAOrdenar.size()+";"+loops * SKIP_TICKS*0.001+" seg";
+		ManejadorArchivos.agregarRegistro(linea);
 	}
 
 	/**
