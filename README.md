@@ -31,20 +31,20 @@ el proceso de ordenamiento.
 	escenario de ordenamiento. Los parametros a setear son los siguientes:
 	
 
-1. La 1ra opcion (desplegable) nor permite elejir que algoritmo de ordenamiento utilizara el programa.
+**1.** La 1ra opcion (desplegable) nor permite elejir que algoritmo de ordenamiento utilizara el programa.
 
-2. La 2da opcion permite especificar que orden previo trae la lista a ordenar, las cuales son:
+**2.** La 2da opcion permite especificar que orden previo trae la lista a ordenar, las cuales son:
 	- ORDENADO
 	- CASI ORDENADO
 	- ALEATORIO
 	- CASI INVERTIDO
 	- INVERTIDO
 	
-3. La 3ra opcion nos habilita para espcificar el tamaño de la lista (cantidad de elementos).
+**3.** La 3ra opcion nos habilita para espcificar el tamaño de la lista (cantidad de elementos).
 
-4. 4ta opcion nos permite setear el tiempo que demora entre cada operacion (mili segundos).
+**4.** 4ta opcion nos permite setear el tiempo que demora entre cada operacion (mili segundos).
 
-5. Luego de setear, se puede presionar el boton Start para iniciar el ordenamiento.
+**5.** Luego de setear, se puede presionar el boton Start para iniciar el ordenamiento.
 
 Desarrollado por Halcones.
 
