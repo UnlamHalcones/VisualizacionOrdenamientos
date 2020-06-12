@@ -7,12 +7,12 @@ import java.io.IOException;
 
 public abstract class ManejadorArchivos {
 
-	private static String directoryName = "Informacion Estadistica";
+	private static String directoryName = "Informacion_Estadistica";
 
 	public static void agregarRegistro(String linea) {
 		checkFolder();
 
-		String path = directoryName + "\\registro.csv";
+		String path = directoryName + File.separator + "registro.csv";
 		BufferedWriter out;
 
 		try {
