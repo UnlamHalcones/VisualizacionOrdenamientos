@@ -24,9 +24,9 @@ public class Seleccion<T extends Comparable<T>> extends EstrategiaOrdenamiento<T
 					posicionDelMenor = j;
 				}
 				jFrameOrdenador.display(posicionDelMenor, j);
+				jFrameOrdenador.sleep();
 			}
 			
-			jFrameOrdenador.sleep();
 			if (posicionDelMenor != i) {
 				intercambiar(arreglo, i, posicionDelMenor);
 				cantOperaciones++;

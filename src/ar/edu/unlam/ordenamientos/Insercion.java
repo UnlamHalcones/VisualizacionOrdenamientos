@@ -23,9 +23,9 @@ public class Insercion<T extends Comparable<T>> extends EstrategiaOrdenamiento<T
 				arreglo.set(j + 1, arreglo.get(j));
 
 				jFrameOrdenador.display(j, i);	
+				jFrameOrdenador.sleep();
 				j = j - 1;
 			}
-			jFrameOrdenador.sleep();
 			
 			if (j + 1 != 0 && arreglo.get(j).compareTo(valorActual) <= 0) {
 				this.cantComparaciones++;

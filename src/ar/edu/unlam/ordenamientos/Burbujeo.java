@@ -24,9 +24,8 @@ public class Burbujeo<T extends Comparable<T>> extends EstrategiaOrdenamiento<T>
 					cantOperaciones++;
 				}
 				jFrameOrdenador.display(i, i + 1);
-				
+				jFrameOrdenador.sleep();				
 			}
-			jFrameOrdenador.sleep();
 		} while (huboCambio);
 	}
 
