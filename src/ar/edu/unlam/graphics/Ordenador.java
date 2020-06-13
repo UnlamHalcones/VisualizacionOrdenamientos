@@ -23,7 +23,11 @@ import java.util.Map;
 @SuppressWarnings("rawtypes")
 public class Ordenador extends JFrame implements Runnable {
 
-    private static Ordenador _instance;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6289028896008795642L;
+	private static Ordenador _instance;
     private final int SECOND = 1000;
     private final int TICKS_PER_SECOND = 1000;
     private final int SKIP_TICKS = SECOND / TICKS_PER_SECOND;
@@ -172,7 +176,12 @@ public class Ordenador extends JFrame implements Runnable {
      */
     private class PanelOrdenador extends JPanel {
 
-        public PanelOrdenador() {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -7342941346106790043L;
+
+		public PanelOrdenador() {
             this.setBackground(Color.BLACK);
 
         }
@@ -230,7 +239,11 @@ public class Ordenador extends JFrame implements Runnable {
     }
 
     private class PanelConfigurador extends JPanel {
-        private final int VEL_MAX = 500;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -7153792617729819826L;
+		private final int VEL_MAX = 500;
         private final int VEL_MIN = 1;
         private final int VEL_DEF = 100;
         private final int TAM_MAX = 500;
