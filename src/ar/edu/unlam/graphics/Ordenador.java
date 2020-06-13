@@ -314,6 +314,7 @@ public class Ordenador extends JFrame implements Runnable {
             validate();
             Ordenador ordenador = Ordenador.getInstance();
             ordenador.metodoOrdenamiento = metodoOrdenamiento;
+            ordenador.estrategiaOrdenamiento = ordenador.mapaEstrategiaOrdenamiento.get(ordenador.metodoOrdenamiento);
             ordenador.elementosAOrdenar = GeneradorDeDatos
                     .generarDatos(ordenador.casoDeOrdenamiento, ordenador.cantidadElementos);
             Ordenador.getInstance().run();
@@ -336,6 +337,7 @@ public class Ordenador extends JFrame implements Runnable {
          */
         private void disableComponents() {
             runButton.setEnabled(false);
+            runAllButton.setEnabled(false);
             elementosSlider.setEnabled(false);
             velocidadSlider.setEnabled(false);
             algoritmoCB.setEnabled(false);
@@ -421,7 +423,6 @@ public class Ordenador extends JFrame implements Runnable {
                 public void actionPerformed(ActionEvent e) {
                     Ordenador ordenador = Ordenador.getInstance();
                     ordenador.metodoOrdenamiento = MetodoOrdenamiento.valueOf(algoritmoCB.getSelectedItem().toString());
-                    ordenador.estrategiaOrdenamiento = ordenador.mapaEstrategiaOrdenamiento.get(ordenador.metodoOrdenamiento);
                 }
             });
         }

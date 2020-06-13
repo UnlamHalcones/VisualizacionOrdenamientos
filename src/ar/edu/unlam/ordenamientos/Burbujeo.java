@@ -12,21 +12,24 @@ public class Burbujeo<T extends Comparable<T>> extends EstrategiaOrdenamiento<T>
 
 	public void ordenar(List<T> arreglo) {
 		boolean huboCambio;
-		do {
+		int i;
+		int j;
+		for(i = 0; i < arreglo.size() -1; i++) {
 			huboCambio = false;
-			for (int i = 0; i < arreglo.size() - 1; i++) {
-				T actual = arreglo.get(i);
-				T comparador = arreglo.get(i+1);
+			for ( j = 0; j < arreglo.size() - 1 - i; j++) {
+				T actual = arreglo.get(j);
+				T comparador = arreglo.get(j+1);
 				cantComparaciones++;
 				if (actual.compareTo(comparador) > 0) {
-					intercambiar(arreglo, i, i + 1);
+					intercambiar(arreglo, j, j + 1);
 					huboCambio = true;
 					cantOperaciones++;
 				}
-				jFrameOrdenador.display(i, i + 1);
+				jFrameOrdenador.display(j, j + 1);
 				jFrameOrdenador.sleep();				
 			}
-		} while (huboCambio);
+			if(!huboCambio) break;
+		}
 	}
 
 }
